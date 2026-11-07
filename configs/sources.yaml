@@ -1,0 +1,20 @@
+# RBI Master Directions used as the knowledge base.
+# Source page: https://www.rbi.org.in/Scripts/BS_ViewMasterDirections.aspx?did=403
+# PDFs are re-downloaded only if missing; delete data/raw/ to refresh after RBI updates them.
+base_url: https://rbidocs.rbi.org.in/rdocs/notification/PDFs
+sources:
+  - id: kyc
+    title: Know Your Customer (KYC) Directions, 2025
+    file: 169MD.PDF
+  - id: cards
+    title: Credit Cards and Debit Cards - Issuance and Conduct Directions, 2025
+    file: 155MD.PDF
+  - id: advances_rates
+    title: Interest Rates on Advances Directions, 2025
+    file: 161MD.PDF
+  - id: deposit_rates
+    title: Interest Rate on Deposits Directions, 2025
+    file: 153MD.PDF
+  - id: conduct
+    title: Responsible Business Conduct Directions, 2025
+    file: 170MD.PDF
