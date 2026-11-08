@@ -10,8 +10,8 @@ RBI regulations (KYC, cards, interest rates, customer conduct) are long PDFs tha
 
 ## Plan
 
-- [ ] Download + parse RBI Master Direction PDFs
-- [ ] Section-aware chunking with metadata (direction, chapter, paragraph number)
+- [x] Download + parse RBI Master Direction PDFs
+- [x] Section-aware chunking with metadata (direction, chapter, paragraph number)
 - [ ] Retrieval (BM25 + embeddings)
 - [ ] Answers with citations, refuse when the documents don't cover the question
 - [ ] Evaluation set (retrieval hit rate, answer faithfulness)
