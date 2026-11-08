@@ -32,3 +32,26 @@ def test_long_paragraph_is_split_at_sub_items():
     assert len(chunks) > 1
     assert all(c.para == "42" for c in chunks)
     assert all(len(c.text) < 1200 for c in chunks)
+
+
+def test_table_of_contents_lines_are_skipped():
+    pages = _pages(
+        "Table of Contents\n"
+        "Chapter I – Preliminary ........................................ 4\n"
+        "A. Short Title and Commencement. ................................ 4\n"
+        "Chapter VI – Customer Due Diligence\n"
+        "16. The bank shall undertake identification of customers before opening an account.",
+    )
+    chunks = chunk_document(pages)
+    assert all("....." not in c.text for c in chunks)
+    assert chunks[-1].chapter == "Chapter VI - Customer Due Diligence"
+
+
+def test_chunk_ids_are_unique():
+    pages = _pages(
+        "Some preamble text that is long enough to become a chunk on its own.\n"
+        "Chapter I – Preliminary\nMore preamble text under chapter one, also long enough to keep.\n"
+        "Chapter II – General\nAnd a third preamble block under chapter two that is long enough.",
+    )
+    ids = [c.id for c in chunk_document(pages)]
+    assert len(ids) == len(set(ids))
