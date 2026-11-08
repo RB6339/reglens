@@ -23,6 +23,8 @@ CHUNKS_FILE = ROOT / "data" / "chunks.jsonl"
 PARA_START = re.compile(r"^(\d{1,3})\.\s+\S")
 CHAPTER = re.compile(r"^Chapter\s+([IVXLC]+)\s*[–-]\s*(.+)$", re.IGNORECASE)
 SUB_ITEM = re.compile(r"^\((?:\d{1,2}|[a-z]{1,4})\)\s")
+# Table-of-contents lines end in dot leaders + a page number: "B. Applicability ........ 4"
+TOC_LINE = re.compile(r"\.{5,}\s*\d+\s*$")
 
 
 @dataclass
@@ -41,7 +43,7 @@ def _iter_lines(pages: list[dict]):
     for page in pages:
         for line in page["text"].splitlines():
             line = line.strip()
-            if line:
+            if line and not TOC_LINE.search(line):
                 yield page["page"], line
 
 
@@ -69,6 +71,7 @@ def chunk_document(pages: list[dict], max_chars: int = 1500, overlap: int = 1) -
         return []
     source, title = pages[0]["source"], pages[0]["title"]
     chunks: list[Chunk] = []
+    seen: dict[str, int] = {}
     chapter, para = "", "preamble"
     buf: list[tuple[int, str]] = []
 
@@ -77,8 +80,12 @@ def chunk_document(pages: list[dict], max_chars: int = 1500, overlap: int = 1) -
             text = "\n".join(t for _, t in piece).strip()
             if len(text) < 40:  # stray headers, lone numbers
                 continue
+            # the same para label can repeat (e.g. "preamble" before each chapter), keep ids unique
+            key = f"{source}:{para}"
+            n = seen.get(key, 0)
+            seen[key] = n + 1
             chunks.append(Chunk(
-                id=f"{source}:{para}:{i}",
+                id=f"{key}:{n}",
                 source=source, title=title, chapter=chapter, para=para,
                 page_start=piece[0][0], page_end=piece[-1][0], text=text,
             ))
