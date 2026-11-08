@@ -12,7 +12,7 @@ RBI regulations (KYC, cards, interest rates, customer conduct) are long PDFs tha
 
 - [x] Download + parse RBI Master Direction PDFs
 - [x] Section-aware chunking with metadata (direction, chapter, paragraph number)
-- [ ] Retrieval (BM25 + embeddings)
+- [ ] Retrieval (BM25 + embeddings) - BM25 done
 - [ ] Answers with citations, refuse when the documents don't cover the question
 - [ ] Evaluation set (retrieval hit rate, answer faithfulness)
 - [ ] FastAPI + simple UI
@@ -23,4 +23,19 @@ RBI regulations (KYC, cards, interest rates, customer conduct) are long PDFs tha
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
+```
+
+## Usage so far
+
+```bash
+python -m reglens.ingest            # download + extract the PDFs listed in configs/sources.yaml
+python -m reglens.chunk             # paragraph-level chunks -> data/chunks.jsonl
+python -m reglens.search "how often should KYC be updated for high risk customers"
+```
+
+Example output:
+
+```
+[1] 14.16  Know Your Customer (KYC) Directions, 2025, para 42, p. 41
+    Chapter VI - Customer Due Diligence (CDD) Procedure
 ```
