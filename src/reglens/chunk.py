@@ -16,7 +16,8 @@ import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+from reglens.paths import ROOT
+
 PROCESSED_DIR = ROOT / "data" / "processed"
 CHUNKS_FILE = ROOT / "data" / "chunks.jsonl"
 
@@ -25,6 +26,8 @@ CHAPTER = re.compile(r"^Chapter\s+([IVXLC]+)\s*[–-]\s*(.+)$", re.IGNORECASE)
 SUB_ITEM = re.compile(r"^\((?:\d{1,2}|[a-z]{1,4})\)\s")
 # Table-of-contents lines end in dot leaders + a page number: "B. Applicability ........ 4"
 TOC_LINE = re.compile(r"\.{5,}\s*\d+\s*$")
+# Annexes restart paragraph numbering at 1, so "para 2" alone would be ambiguous
+ANNEX = re.compile(r"^Annex\s*[–-]\s*([IVXLC]+)\s*$", re.IGNORECASE)
 
 
 @dataclass
@@ -37,6 +40,7 @@ class Chunk:
     page_start: int
     page_end: int
     text: str
+    annex: str = ""  # "I", "II" ... for chunks inside an annex
 
 
 def _iter_lines(pages: list[dict]):
@@ -72,7 +76,7 @@ def chunk_document(pages: list[dict], max_chars: int = 1500, overlap: int = 1) -
     source, title = pages[0]["source"], pages[0]["title"]
     chunks: list[Chunk] = []
     seen: dict[str, int] = {}
-    chapter, para = "", "preamble"
+    chapter, para, annex = "", "preamble", ""
     buf: list[tuple[int, str]] = []
 
     def flush() -> None:
@@ -80,22 +84,31 @@ def chunk_document(pages: list[dict], max_chars: int = 1500, overlap: int = 1) -
             text = "\n".join(t for _, t in piece).strip()
             if len(text) < 40:  # stray headers, lone numbers
                 continue
-            # the same para label can repeat (e.g. "preamble" before each chapter), keep ids unique
-            key = f"{source}:{para}"
+            # the same para label can repeat (e.g. "intro" before each chapter), keep ids unique
+            key = f"{source}:annex-{annex.lower()}-{para}" if annex else f"{source}:{para}"
             n = seen.get(key, 0)
             seen[key] = n + 1
             chunks.append(Chunk(
                 id=f"{key}:{n}",
-                source=source, title=title, chapter=chapter, para=para,
+                source=source, title=title, chapter=chapter, para=para, annex=annex,
                 page_start=piece[0][0], page_end=piece[-1][0], text=text,
             ))
 
     for page_no, line in _iter_lines(pages):
+        m_annex = ANNEX.match(line)
+        if m_annex:
+            flush()
+            buf = []
+            annex = m_annex.group(1).upper()
+            chapter, para = f"Annex {annex}", "intro"
+            continue
         m_ch = CHAPTER.match(line)
-        if m_ch:
+        if m_ch and not annex:
             flush()
             buf = []
             chapter = f"Chapter {m_ch.group(1)} - {m_ch.group(2).strip()}"
+            # text between a chapter heading and its first numbered paragraph is not the previous para
+            para = "intro"
             continue
         m_para = PARA_START.match(line)
         if m_para:

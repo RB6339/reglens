@@ -39,8 +39,9 @@ class Hit:
     def citation(self) -> str:
         c = self.chunk
         pages = str(c["page_start"]) if c["page_start"] == c["page_end"] else f"{c['page_start']}-{c['page_end']}"
-        para = f"para {c['para']}" if c["para"] != "preamble" else "preamble"
-        return f"{c['title']}, {para}, p. {pages}"
+        para = c["para"] if c["para"] in ("preamble", "intro") else f"para {c['para']}"
+        where = f"Annex {c['annex']}, {para}" if c.get("annex") else para
+        return f"{c['title']}, {where}, p. {pages}"
 
 
 class BM25:
