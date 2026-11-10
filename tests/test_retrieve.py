@@ -39,3 +39,8 @@ def test_citation_format():
     assert hit.citation == "KYC Directions, para 38, p. 30"
     span = Hit(1.0, {**_chunk("preamble", "text"), "page_start": 1, "page_end": 2})
     assert span.citation == "KYC Directions, preamble, p. 1-2"
+
+
+def test_annex_citation_format():
+    hit = Hit(1.0, {**_chunk("8", "text", page=83), "annex": "I"})
+    assert hit.citation == "KYC Directions, Annex I, para 8, p. 83"

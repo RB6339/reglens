@@ -55,3 +55,26 @@ def test_chunk_ids_are_unique():
     )
     ids = [c.id for c in chunk_document(pages)]
     assert len(ids) == len(set(ids))
+
+
+def test_annex_paragraphs_get_their_own_labels():
+    pages = _pages(
+        "Chapter XI – Repeal and Other Provisions\n"
+        "2. The provisions of these Directions shall be in addition to any other law in force.\n"
+        "Annex – I\n"
+        "2. The procedure for freezing of funds of designated individuals is outlined below.",
+    )
+    chunks = chunk_document(pages)
+    main, annex = chunks[0], chunks[-1]
+    assert (main.para, main.annex) == ("2", "")
+    assert (annex.para, annex.annex, annex.chapter) == ("2", "I", "Annex I")
+    assert main.id != annex.id and annex.id.startswith("kyc:annex-i-2")
+
+
+def test_text_after_chapter_heading_is_not_the_previous_para():
+    pages = _pages(
+        "7. The Board shall review the KYC policy at regular intervals of time.\n"
+        "Chapter III – Customer Acceptance Policy\n"
+        "This chapter sets out the minimum requirements for accepting new customers.",
+    )
+    assert chunk_document(pages)[-1].para == "intro"
