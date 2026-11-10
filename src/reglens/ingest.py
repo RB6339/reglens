@@ -18,7 +18,8 @@ import requests
 import yaml
 from pypdf import PdfReader
 
-ROOT = Path(__file__).resolve().parents[2]
+from reglens.paths import ROOT
+
 RAW_DIR = ROOT / "data" / "raw"
 PROCESSED_DIR = ROOT / "data" / "processed"
 SOURCES_FILE = ROOT / "configs" / "sources.yaml"

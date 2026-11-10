@@ -17,9 +17,9 @@ from typing import Protocol
 
 import numpy as np
 
+from reglens.paths import ROOT
 from reglens.retrieve import BM25, Hit
 
-ROOT = Path(__file__).resolve().parents[2]
 EMB_FILE = ROOT / "data" / "embeddings.npy"
 DEFAULT_MODEL = "BAAI/bge-small-en-v1.5"
 # bge models expect this prefix on queries (not on passages)

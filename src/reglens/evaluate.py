@@ -18,7 +18,8 @@ import argparse
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+from reglens.paths import ROOT
+
 EVAL_FILE = ROOT / "eval" / "kyc_questions.jsonl"
 
 
