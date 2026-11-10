@@ -5,6 +5,8 @@ Ask questions about RBI Master Directions and get answers with citations to the 
 [![CI](https://github.com/RB6339/reglens/actions/workflows/ci.yml/badge.svg)](https://github.com/RB6339/reglens/actions)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue) ![RAG](https://img.shields.io/badge/RAG-hybrid%20retrieval-green) ![FastAPI](https://img.shields.io/badge/FastAPI-API-teal)
 
+**[▶ Live demo](https://huggingface.co/spaces/RB6339/reglens)**: paragraph search with citations, running in the browser on Hugging Face Spaces.
+
 ```
 Q: How often should KYC be updated for high risk customers?
 A: ... at least once every two years for high risk customers ... [1]
